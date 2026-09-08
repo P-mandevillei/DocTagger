@@ -4,11 +4,11 @@
  * and Google Workspace Marketplace SDK.
  */
 var DTI_PUBLIC_LINKS = {
-  home: '',
-  privacy: '',
-  terms: '',
-  support: '',
-  deletion: '',
+  home: 'https://p-mandevillei.github.io/DocTagger/index.html',
+  privacy: 'https://p-mandevillei.github.io/DocTagger/privacy.html',
+  terms: 'https://p-mandevillei.github.io/DocTagger/terms.html',
+  support: 'https://p-mandevillei.github.io/DocTagger/support.html',
+  deletion: 'https://p-mandevillei.github.io/DocTagger/delete-data.html',
 };
 
 function getPublicLinks() {

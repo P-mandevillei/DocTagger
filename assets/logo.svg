@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">Doc Tag Index logo</title>
+  <path d="M130 230a72 72 0 0 1 72-72h420a80 80 0 0 1 62 29l226 275a80 80 0 0 1 0 102L684 837a80 80 0 0 1-62 29H202a72 72 0 0 1-72-72Z" fill="#163b5c"/>
+  <circle cx="290" cy="512" r="70" fill="#48b8b2"/>
+  <rect x="430" y="358" width="294" height="54" rx="27" fill="#fff"/>
+  <rect x="430" y="485" width="228" height="54" rx="27" fill="#fff"/>
+  <rect x="430" y="612" width="294" height="54" rx="27" fill="#fff"/>
+</svg>

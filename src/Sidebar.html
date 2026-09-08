@@ -1,0 +1,511 @@
+<!doctype html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      :root {
+        color: #202124;
+        font: 13px/1.45 Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 14px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 4px;
+      }
+      h2 {
+        font-size: 14px;
+        margin: 0 0 9px;
+      }
+      p {
+        margin: 5px 0 10px;
+      }
+      .muted {
+        color: #5f6368;
+      }
+      .card {
+        border-top: 1px solid #dadce0;
+        margin-top: 14px;
+        padding-top: 14px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 8px 0 4px;
+      }
+      input, select, textarea, button {
+        box-sizing: border-box;
+        font: inherit;
+        width: 100%;
+      }
+      input, select, textarea {
+        border: 1px solid #bdc1c6;
+        border-radius: 4px;
+        padding: 7px 8px;
+      }
+      textarea {
+        min-height: 58px;
+        resize: vertical;
+      }
+      button {
+        cursor: pointer;
+        margin-top: 9px;
+      }
+      button.danger {
+        background: white;
+        border: 1px solid #dadce0;
+        color: #3c4043;
+        margin: 0;
+        padding: 5px 7px;
+        width: auto;
+      }
+      button:disabled {
+        cursor: default;
+        opacity: .55;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      .row > * {
+        flex: 1;
+      }
+      #status {
+        border-radius: 4px;
+        display: none;
+        margin: 10px 0;
+        padding: 8px;
+      }
+      #status.info {
+        background: #e8f0fe;
+        color: #174ea6;
+        display: block;
+      }
+      #status.error {
+        background: #fce8e6;
+        color: #a50e0e;
+        display: block;
+      }
+      .tag-row {
+        align-items: flex-start;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        padding: 8px 0;
+      }
+      .tag-label {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+      .tag-context {
+        color: #5f6368;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .checkbox-row {
+        align-items: flex-start;
+        display: flex;
+        font-weight: normal;
+        gap: 7px;
+      }
+      .checkbox-row input {
+        margin-top: 3px;
+        width: auto;
+      }
+      .privacy-links {
+        border-top: 1px solid #dadce0;
+        font-size: 11px;
+        margin-top: 16px;
+        padding-top: 10px;
+      }
+      .privacy-links a {
+        margin-right: 10px;
+      }
+      dialog {
+        border: 0;
+        border-radius: 8px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .25);
+        max-width: 250px;
+        padding: 16px;
+      }
+      dialog::backdrop {
+        background: rgba(32, 33, 36, .35);
+      }
+      a {
+        color: #1a73e8;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Doc Tag Index</h1>
+    <p id="documentTitle" class="muted">Loading…</p>
+    <div id="status"></div>
+
+    <section id="consent" class="card" hidden>
+      <h2>Before you continue</h2>
+      <p>
+        Doc Tag Index reads this document's title and managed tag text. When
+        you insert or sync tags, it writes the document title, document and tag
+        links, tag values, identifiers, and sync times to the registry Sheet
+        you choose.
+      </p>
+      <p>
+        Data stays in Google files and app properties under your control. It is
+        visible to anyone you share the document or registry with. The add-on
+        does not send document content to the developer or advertising,
+        analytics, or AI services.
+      </p>
+      <label class="checkbox-row" for="consentCheckbox">
+        <input id="consentCheckbox" type="checkbox">
+        <span>I understand and want to use Doc Tag Index.</span>
+      </label>
+      <button id="acceptDataUse" class="action" disabled>Continue</button>
+    </section>
+
+    <section id="setup" class="card" hidden>
+      <h2>Connect a registry</h2>
+      <p class="muted">
+        Create a dedicated Sheet, or connect one you control. Connecting an
+        existing Sheet adds and manages the Properties, Occurrences, Summary,
+        and Documents tabs.
+      </p>
+      <button id="createRegistry" class="action">Create new registry</button>
+      <label for="registryInput">Existing Google Sheet URL or ID</label>
+      <input id="registryInput" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/…">
+      <button id="connectRegistry">Connect existing registry</button>
+    </section>
+
+    <section id="migration" class="card" hidden>
+      <h2>Registry update required</h2>
+      <p id="migrationMessage"></p>
+      <p class="muted">
+        This permanently removes the pre-release Context and Active columns.
+        Make a copy of the registry first if you need that historical data.
+      </p>
+      <button id="migrateRegistry" class="action">Migrate registry</button>
+    </section>
+
+    <div id="connected" hidden>
+      <section class="card">
+        <h2>Insert a tag</h2>
+        <label for="propertySelect">Property</label>
+        <select id="propertySelect"></select>
+        <label for="optionSelect">Option</label>
+        <select id="optionSelect"></select>
+        <button id="insertTag" class="action">Insert tag at cursor</button>
+        <button id="sync">Sync current document</button>
+        <p><a id="registryLink" target="_blank" rel="noopener">Open registry Sheet</a></p>
+      </section>
+
+      <section class="card">
+        <h2>Add property options</h2>
+        <label for="propertyName">Property name</label>
+        <input id="propertyName" maxlength="80" placeholder="Status">
+        <label for="propertyOptions">Options</label>
+        <textarea id="propertyOptions" placeholder="Draft, Reviewed, Published"></textarea>
+        <label for="propertyColor">Tag color</label>
+        <input id="propertyColor" type="color" value="#dce6f1">
+        <button id="saveProperty">Add options</button>
+      </section>
+
+      <section class="card">
+        <h2>Tags in this document</h2>
+        <div id="currentTags" class="muted">No managed tags.</div>
+      </section>
+
+      <section class="card">
+        <h2>Document data</h2>
+        <button id="disconnect">Disconnect without deleting indexed data</button>
+        <button id="deleteDocumentData" class="danger">Delete this document's registry data</button>
+      </section>
+    </div>
+
+    <nav class="privacy-links" aria-label="Product links">
+      <a data-public-link="privacy" target="_blank" rel="noopener" hidden>Privacy</a>
+      <a data-public-link="terms" target="_blank" rel="noopener" hidden>Terms</a>
+      <a data-public-link="support" target="_blank" rel="noopener" hidden>Support</a>
+      <a data-public-link="deletion" target="_blank" rel="noopener" hidden>Delete data</a>
+    </nav>
+
+    <dialog id="errorDialog" aria-labelledby="errorTitle">
+      <h2 id="errorTitle">Unable to complete that action</h2>
+      <p id="errorMessage"></p>
+      <button id="closeError" class="action">Close</button>
+    </dialog>
+
+    <script>
+      var state = null;
+
+      function serverCall(name) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return new Promise(function (resolve, reject) {
+          var runner = google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(function (error) {
+              reject(new Error(error && error.message ? error.message : String(error)));
+            });
+          runner[name].apply(runner, args);
+        });
+      }
+
+      function setBusy(busy) {
+        Array.prototype.forEach.call(document.querySelectorAll('button'), function (button) {
+          button.disabled = busy;
+        });
+        if (!busy) {
+          updateButtonStates();
+        }
+      }
+
+      function updateButtonStates() {
+        var hasOptions = Boolean(
+          state && state.properties && state.properties.some(function (property) {
+            return property.options && property.options.some(function (option) {
+              return option.active !== false;
+            });
+          })
+        );
+        document.getElementById('insertTag').disabled = !hasOptions;
+        document.getElementById('acceptDataUse').disabled =
+          !document.getElementById('consentCheckbox').checked;
+      }
+
+      function showStatus(message, isError) {
+        if (isError && message) {
+          var dialog = document.getElementById('errorDialog');
+          document.getElementById('errorMessage').textContent = message;
+          if (typeof dialog.showModal === 'function') {
+            if (!dialog.open) {
+              dialog.showModal();
+            }
+            return;
+          }
+        }
+        var status = document.getElementById('status');
+        status.textContent = message || '';
+        status.className = isError ? 'error' : 'info';
+        status.style.display = message ? 'block' : 'none';
+      }
+
+      function handle(action, successMessage) {
+        setBusy(true);
+        showStatus('Working…', false);
+        return action().then(function (result) {
+          var nextState = result && result.state ? result.state : result;
+          if (nextState && nextState.document) {
+            render(nextState);
+          }
+          if (nextState && nextState.registryError) {
+            showStatus(nextState.registryError, true);
+          } else {
+            showStatus((result && result.message) || successMessage || 'Done.', false);
+          }
+          return result;
+        }).catch(function (error) {
+          showStatus(error.message, true);
+          return null;
+        }).finally(function () {
+          setBusy(false);
+        });
+      }
+
+      function render(nextState) {
+        state = nextState;
+        document.getElementById('documentTitle').textContent = nextState.document.title;
+        renderPublicLinks(nextState.links || {});
+        var needsConsent = Boolean(nextState.needsConsent);
+        document.getElementById('consent').hidden = !needsConsent;
+        if (needsConsent) {
+          document.getElementById('setup').hidden = true;
+          document.getElementById('migration').hidden = true;
+          document.getElementById('connected').hidden = true;
+          updateButtonStates();
+          return;
+        }
+        var migrationRequired = Boolean(nextState.migrationRequired);
+        document.getElementById('migration').hidden = !migrationRequired;
+        document.getElementById('migrationMessage').textContent =
+          migrationRequired ? nextState.registryError : '';
+        var connected = Boolean(nextState.registry);
+        document.getElementById('setup').hidden = connected || migrationRequired;
+        document.getElementById('connected').hidden = !connected;
+
+        if (!connected) {
+          if (nextState.registryError) {
+            showStatus(nextState.registryError, true);
+          }
+          return;
+        }
+
+        var link = document.getElementById('registryLink');
+        link.href = nextState.registry.url;
+        link.textContent = 'Open ' + nextState.registry.name;
+        renderProperties();
+        renderCurrentTags();
+      }
+
+      function renderPublicLinks(links) {
+        Array.prototype.forEach.call(
+          document.querySelectorAll('[data-public-link]'),
+          function (link) {
+            var url = links[link.getAttribute('data-public-link')];
+            link.hidden = !url;
+            if (url) {
+              link.href = url;
+            } else {
+              link.removeAttribute('href');
+            }
+          }
+        );
+      }
+
+      function renderProperties() {
+        var propertySelect = document.getElementById('propertySelect');
+        propertySelect.textContent = '';
+        (state.properties || []).forEach(function (property) {
+          var option = document.createElement('option');
+          option.value = property.id;
+          option.textContent = property.name;
+          propertySelect.appendChild(option);
+        });
+        renderOptions();
+        updateButtonStates();
+      }
+
+      function renderOptions() {
+        var propertyId = document.getElementById('propertySelect').value;
+        var property = (state.properties || []).filter(function (item) {
+          return item.id === propertyId;
+        })[0];
+        var optionSelect = document.getElementById('optionSelect');
+        optionSelect.textContent = '';
+        (property ? property.options : []).filter(function (option) {
+          return option.active !== false;
+        }).forEach(function (item) {
+          var option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          optionSelect.appendChild(option);
+        });
+      }
+
+      function renderCurrentTags() {
+        var container = document.getElementById('currentTags');
+        container.textContent = '';
+        if (!state.currentTags || !state.currentTags.length) {
+          container.textContent = 'No managed tags.';
+          container.className = 'muted';
+          return;
+        }
+        container.className = '';
+        state.currentTags.slice(0, 25).forEach(function (tag) {
+          var row = document.createElement('div');
+          row.className = 'tag-row';
+          var details = document.createElement('div');
+          var label = document.createElement('a');
+          label.className = 'tag-label';
+          label.href = tag.tagUrl;
+          label.target = '_blank';
+          label.rel = 'noopener';
+          label.textContent = tag.tagText;
+          details.appendChild(label);
+          var remove = document.createElement('button');
+          remove.className = 'danger';
+          remove.textContent = 'Remove';
+          remove.addEventListener('click', function () {
+            if (!window.confirm('Remove ' + tag.tagText + ' from this document?')) {
+              return;
+            }
+            handle(function () { return serverCall('removeTag', tag.occurrenceId); });
+          });
+          row.appendChild(details);
+          row.appendChild(remove);
+          container.appendChild(row);
+        });
+        if (state.currentTags.length > 25) {
+          var remainder = document.createElement('p');
+          remainder.className = 'muted';
+          remainder.textContent = 'Showing 25 of ' + state.currentTags.length +
+            ' tags. Use the registry Sheet to review the full index.';
+          container.appendChild(remainder);
+        }
+      }
+
+      document.getElementById('propertySelect').addEventListener('change', renderOptions);
+      document.getElementById('closeError').addEventListener('click', function () {
+        document.getElementById('errorDialog').close();
+      });
+      document.getElementById('consentCheckbox').addEventListener('change', updateButtonStates);
+      document.getElementById('acceptDataUse').addEventListener('click', function () {
+        handle(function () { return serverCall('acceptDataUse'); }, 'Data-use preference saved.');
+      });
+      document.getElementById('createRegistry').addEventListener('click', function () {
+        handle(function () { return serverCall('createRegistry'); }, 'Registry created.');
+      });
+      document.getElementById('migrateRegistry').addEventListener('click', function () {
+        if (!window.confirm(
+          'Migrate this registry? The legacy Context and Active columns will be permanently deleted.'
+        )) {
+          return;
+        }
+        handle(function () { return serverCall('migrateLegacyRegistry'); });
+      });
+      document.getElementById('connectRegistry').addEventListener('click', function () {
+        var value = document.getElementById('registryInput').value;
+        if (!window.confirm(
+          'Connect this Sheet? Doc Tag Index will add or manage four dedicated tabs in it.'
+        )) {
+          return;
+        }
+        handle(function () { return serverCall('connectRegistry', value); }, 'Registry connected.');
+      });
+      document.getElementById('disconnect').addEventListener('click', function () {
+        handle(function () { return serverCall('disconnectRegistry'); }, 'Registry disconnected.');
+      });
+      document.getElementById('deleteDocumentData').addEventListener('click', function () {
+        if (!window.confirm(
+          'Delete this document\'s indexed rows from the registry? Tags in the document will remain.'
+        )) {
+          return;
+        }
+        handle(function () { return serverCall('deleteCurrentDocumentData'); });
+      });
+      document.getElementById('saveProperty').addEventListener('click', function () {
+        var name = document.getElementById('propertyName').value;
+        var options = document.getElementById('propertyOptions').value;
+        var color = document.getElementById('propertyColor').value;
+        handle(function () {
+          return serverCall('savePropertyDefinition', name, options, color);
+        }, 'Property options added.').then(function (result) {
+          if (result) {
+            document.getElementById('propertyName').value = '';
+            document.getElementById('propertyOptions').value = '';
+          }
+        });
+      });
+      document.getElementById('insertTag').addEventListener('click', function () {
+        var propertyId = document.getElementById('propertySelect').value;
+        var optionId = document.getElementById('optionSelect').value;
+        handle(function () { return serverCall('insertTag', propertyId, optionId); });
+      });
+      document.getElementById('sync').addEventListener('click', function () {
+        handle(function () {
+          return serverCall('syncCurrentDocument').then(function (result) {
+            return serverCall('getSidebarState').then(function (nextState) {
+              return { state: nextState, message: result.message };
+            });
+          });
+        });
+      });
+
+      handle(function () { return serverCall('getSidebarState'); }, 'Ready.');
+    </script>
+  </body>
+</html>

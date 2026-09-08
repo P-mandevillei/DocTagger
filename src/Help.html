@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      body { color: #202124; font: 13px/1.5 Arial, sans-serif; padding: 16px; }
+      h2 { font-size: 15px; margin: 18px 0 6px; }
+      p, li { max-width: 410px; }
+      nav { border-top: 1px solid #dadce0; margin-top: 18px; padding-top: 12px; }
+      nav a { margin-right: 12px; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <p>
+      Doc Tag Index adds controlled, visible property tags to the current
+      document and writes an index of those tags to a Google Sheet selected by
+      the user.
+    </p>
+
+    <h2>Data used</h2>
+    <p>
+      The add-on reads the current document's title and managed tag text. When
+      you synchronize, it stores the title, document and tag links, tag values,
+      internal identifiers, and synchronization times in your chosen registry
+      Sheet. It does not copy surrounding passages.
+    </p>
+    <p>
+      The developer does not receive document or registry content. Access is
+      controlled by the sharing settings on your Google files.
+    </p>
+
+    <h2>Manage or delete data</h2>
+    <ul>
+      <li>Use the sidebar's deletion action to purge the current document's indexed rows.</li>
+      <li>Delete the registry Sheet to remove the entire index.</li>
+      <li>Remove the visible tags normally in Docs if you no longer need them.</li>
+      <li>Uninstall the add-on and revoke its access from your Google Account to stop future access.</li>
+    </ul>
+
+    <nav aria-label="Product links">
+      <a data-public-link="home" target="_blank" rel="noopener" hidden>Website</a>
+      <a data-public-link="privacy" target="_blank" rel="noopener" hidden>Privacy</a>
+      <a data-public-link="terms" target="_blank" rel="noopener" hidden>Terms</a>
+      <a data-public-link="support" target="_blank" rel="noopener" hidden>Support</a>
+      <a data-public-link="deletion" target="_blank" rel="noopener" hidden>Delete data</a>
+    </nav>
+
+    <script>
+      google.script.run.withSuccessHandler(function (links) {
+        Array.prototype.forEach.call(
+          document.querySelectorAll('[data-public-link]'),
+          function (link) {
+            var url = links[link.getAttribute('data-public-link')];
+            link.hidden = !url;
+            if (url) {
+              link.href = url;
+            }
+          }
+        );
+      }).getPublicLinks();
+    </script>
+  </body>
+</html>

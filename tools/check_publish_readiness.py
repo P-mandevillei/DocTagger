@@ -22,10 +22,10 @@ def check(condition, label, detail=""):
 
 required_site = ["index.html", "privacy.html", "terms.html", "support.html", "delete-data.html"]
 for filename in required_site:
-    check((ROOT / "site" / filename).exists(), f"Public site file: {filename}")
+    check((ROOT / "docs" / filename).exists(), f"Public site file: {filename}")
 
 missing_links = []
-for path in (ROOT / "site").glob("*.html"):
+for path in (ROOT / "docs").glob("*.html"):
     source = path.read_text(encoding="utf-8")
     HTMLParser().feed(source)
     for target in re.findall(r'(?:href|src)="([^"#:]+)"', source):
@@ -36,21 +36,21 @@ for path in (ROOT / "site").glob("*.html"):
 check(not missing_links, "Public site relative links resolve", ", ".join(missing_links))
 
 publisher_text = "\n".join(
-    path.read_text(encoding="utf-8") for path in (ROOT / "site").glob("*.html")
+    path.read_text(encoding="utf-8") for path in (ROOT / "docs").glob("*.html")
 )
 publisher_text += "\n" + (ROOT / "MARKETPLACE_LISTING.md").read_text(encoding="utf-8")
 publisher_text += "\n" + (ROOT / "LICENSE").read_text(encoding="utf-8")
 check(
-    not re.search(r"\[(?:YOUR|VERIFY|TRADER OR NON-TRADER) [^\]]+\]", publisher_text),
+    not re.search(r"\[(?:YOUR|VERIFY|SELECT|TRADER OR NON-TRADER) [^\]]+\]", publisher_text),
     "Publisher placeholders replaced",
-    "enter legal identity, address, email, domain, and jurisdiction",
+    "choose the governing-law jurisdiction and EEA trader status",
 )
 
-config_text = (ROOT / "src" / "Config.gs").read_text(encoding="utf-8")
+config_text = (ROOT / "src" / "Config.js").read_text(encoding="utf-8")
 configured_urls = re.findall(r"\b(?:home|privacy|terms|support|deletion):\s*'([^']*)'", config_text)
 check(
     len(configured_urls) == 5 and all(url.startswith("https://") for url in configured_urls),
-    "Production URLs configured in src/Config.gs",
+    "Production URLs configured in src/Config.js",
     "all five URLs must use the verified HTTPS domain",
 )
 
@@ -88,13 +88,27 @@ check(
     "capture 1280x800 after deploying the production-branded add-on",
 )
 
-code = (ROOT / "src" / "Code.gs").read_text(encoding="utf-8")
+code = (ROOT / "src" / "Code.js").read_text(encoding="utf-8")
 sidebar = (ROOT / "src" / "Sidebar.html").read_text(encoding="utf-8")
 check("dtiRequireDataUseConsent_" in code and "consentCheckbox" in sidebar, "In-product consent gate")
 check("dtiSafeSheetText" in code, "Formula-leading text protection")
 check("deleteCurrentDocumentData" in code, "Per-document deletion control")
 check("dtiContextForRange_" not in code, "No surrounding passage collection")
 check("add-ons1.css" in sidebar, "Google Editor add-on CSS package")
+
+branding_text = "\n".join(
+    path.read_text(encoding="utf-8")
+    for path in [
+        ROOT / "README.md",
+        ROOT / "MARKETPLACE_LISTING.md",
+        ROOT / "OAUTH_VERIFICATION.md",
+        ROOT / "src" / "Code.js",
+        ROOT / "src" / "Sidebar.html",
+        ROOT / "src" / "Help.html",
+        *sorted((ROOT / "docs").glob("*.html")),
+    ]
+)
+check("Doc Tag Index" not in branding_text, "DocTagger branding is consistent")
 
 print()
 if failures:

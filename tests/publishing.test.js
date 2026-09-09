@@ -34,6 +34,6 @@ test('public site includes required policy and support pages', () => {
   for (const filename of [
     'index.html', 'privacy.html', 'terms.html', 'support.html', 'delete-data.html',
   ]) {
-    assert.equal(fs.existsSync(path.join(root, 'site', filename)), true, filename);
+    assert.equal(fs.existsSync(path.join(root, 'docs', filename)), true, filename);
   }
 });

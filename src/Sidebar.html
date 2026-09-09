@@ -144,14 +144,14 @@
     </style>
   </head>
   <body>
-    <h1>Doc Tag Index</h1>
+    <h1>DocTagger</h1>
     <p id="documentTitle" class="muted">Loading…</p>
     <div id="status"></div>
 
     <section id="consent" class="card" hidden>
       <h2>Before you continue</h2>
       <p>
-        Doc Tag Index reads this document's title and managed tag text. When
+        DocTagger reads this document's title and managed tag text. When
         you insert or sync tags, it writes the document title, document and tag
         links, tag values, identifiers, and sync times to the registry Sheet
         you choose.
@@ -164,7 +164,7 @@
       </p>
       <label class="checkbox-row" for="consentCheckbox">
         <input id="consentCheckbox" type="checkbox">
-        <span>I understand and want to use Doc Tag Index.</span>
+        <span>I understand and want to use DocTagger.</span>
       </label>
       <button id="acceptDataUse" class="action" disabled>Continue</button>
     </section>
@@ -460,7 +460,7 @@
       document.getElementById('connectRegistry').addEventListener('click', function () {
         var value = document.getElementById('registryInput').value;
         if (!window.confirm(
-          'Connect this Sheet? Doc Tag Index will add or manage four dedicated tabs in it.'
+          'Connect this Sheet? DocTagger will add or manage four dedicated tabs in it.'
         )) {
           return;
         }

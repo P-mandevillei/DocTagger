@@ -1,6 +1,6 @@
-# Doc Tag Index
+# DocTagger
 
-Doc Tag Index is a Google Docs Editor add-on that inserts structured, visible
+DocTagger is a Google Docs Editor add-on that inserts structured, visible
 tags into a document and indexes every tag occurrence in a central Google
 Sheet.
 
@@ -53,7 +53,7 @@ name fields are plain text rather than formulas.
 4. Choose **Deploy > Test deployments**, select **Editor add-on**, and install
    the deployment for Google Docs.
 5. Open or refresh a Google Doc, then choose
-   **Extensions > Doc Tag Index > Open sidebar**.
+   **Extensions > DocTagger > Open sidebar**.
 6. Create a new registry or connect an existing Google Sheet.
 
 Share the registry Sheet with the same writers who will synchronize tags. The
@@ -67,7 +67,9 @@ release.
 
 ## Prepare a public release
 
-Start with [PUBLISHING_CHECKLIST.md](PUBLISHING_CHECKLIST.md). The repository
+Start with [PUBLISHING_RUNBOOK.md](PUBLISHING_RUNBOOK.md) for the ordered
+release procedure and use [PUBLISHING_CHECKLIST.md](PUBLISHING_CHECKLIST.md)
+to track completion. The repository
 also contains:
 
 - [MARKETPLACE_LISTING.md](MARKETPLACE_LISTING.md), with listing copy and asset
@@ -75,12 +77,15 @@ also contains:
 - [OAUTH_VERIFICATION.md](OAUTH_VERIFICATION.md), with scope justifications and
   a verification-video script;
 - [REVIEW_TEST_PLAN.md](REVIEW_TEST_PLAN.md), for production manual testing;
-- `site/`, containing homepage, privacy, terms, support, and deletion-page
+- `docs/`, containing the GitHub Pages homepage, privacy, terms, support, and deletion-page
   templates; and
 - `assets/`, containing icons and the Marketplace card banner.
 
-Before deployment, publish `site/` on a verified HTTPS domain, replace its
-publisher placeholders, and enter the final public URLs in `src/Config.gs`.
+The public site is configured for
+<https://p-mandevillei.github.io/DocTagger/>. Before submission, publish the
+current `docs/` files, resolve the remaining jurisdiction placeholder, and
+confirm that Google accepts the site host as an authorized, owned domain. The
+final URLs are stored in `src/Config.js`.
 
 Existing pre-release registries use an older Occurrences schema that stored a
 context excerpt and inactive-history flag. The updated sidebar requires an
@@ -114,7 +119,7 @@ named range and bookmark after confirmation.
 ## Development
 
 The code is plain Apps Script JavaScript. Pure parsing and aggregation helpers
-live in `src/Core.gs` and are exercised with Node's built-in test runner:
+live in `src/Core.js` and are exercised with Node's built-in test runner:
 
 ```text
 node --test tests/core.test.js

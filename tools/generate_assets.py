@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
-SITE_ASSETS = ROOT / "site" / "assets"
+SITE_ASSETS = ROOT / "docs" / "assets"
 SCALE = 4
 
 
@@ -59,8 +59,7 @@ def make_banner():
     draw.rounded_rectangle(scaled((8, 8, 212, 132)), radius=scaled((16,))[0], fill="#E4F1F2")
     icon = draw_mark(72).resize(scaled((72, 72)), Image.Resampling.LANCZOS)
     image.paste(icon, scaled((16, 34)), icon)
-    draw.text(scaled((94, 42)), "Doc Tag", font=font(21, bold=True), fill="#163B5C")
-    draw.text(scaled((94, 67)), "Index", font=font(21, bold=True), fill="#163B5C")
+    draw.text(scaled((94, 52)), "DocTagger", font=font(19, bold=True), fill="#163B5C")
     draw.text(scaled((94, 98)), "Tags · counts · links", font=font(9), fill="#2D6F73")
     image.resize((width, height), Image.Resampling.LANCZOS).save(
         ASSETS / "card-banner-220x140.png", optimize=True

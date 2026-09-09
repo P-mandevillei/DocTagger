@@ -58,7 +58,7 @@ function dtiBuildTagText(propertyName, optionName) {
 /**
  * Prevents user-controlled strings from being interpreted as formulas when
  * they are written to Google Sheets. The zero-width prefix is removed again
- * when Doc Tag Index reads its own values.
+ * when DocTagger reads its own values.
  */
 function dtiSafeSheetText(value) {
   var text = String(value == null ? '' : value);

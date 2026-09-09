@@ -1,10 +1,10 @@
 /**
- * Replace these URLs after publishing the files in site/ on a verified domain
- * that you own. They must match the URLs entered in the OAuth consent screen
+ * These URLs point to the public pages published from docs/ on the verified
+ * production domain. They must match the URLs entered in the OAuth consent screen
  * and Google Workspace Marketplace SDK.
  */
 var DTI_PUBLIC_LINKS = {
-  home: 'https://p-mandevillei.github.io/DocTagger/index.html',
+  home: 'https://p-mandevillei.github.io/DocTagger/',
   privacy: 'https://p-mandevillei.github.io/DocTagger/privacy.html',
   terms: 'https://p-mandevillei.github.io/DocTagger/terms.html',
   support: 'https://p-mandevillei.github.io/DocTagger/support.html',

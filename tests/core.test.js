@@ -4,10 +4,10 @@ const path = require('node:path');
 const test = require('node:test');
 const vm = require('node:vm');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'Core.gs'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'Core.js'), 'utf8');
 const context = { encodeURIComponent };
 vm.createContext(context);
-vm.runInContext(source, context, { filename: 'Core.gs' });
+vm.runInContext(source, context, { filename: 'Core.js' });
 
 test('extracts an ID from a Sheets URL', () => {
   assert.equal(

@@ -1,8 +1,8 @@
 {
-  "name": "google-doc-tag-index",
+  "name": "doctagger-google-docs",
   "version": "0.2.0",
   "private": true,
-  "description": "Google Docs property tags indexed in a central Google Sheet",
+  "description": "DocTagger property tags indexed in a central Google Sheet",
   "scripts": {
     "test": "node --test tests/core.test.js tests/code.test.js tests/publishing.test.js"
   },

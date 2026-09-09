@@ -50,7 +50,7 @@ function onInstall(e) {
 
 function showDocTagSidebar() {
   var output = HtmlService.createHtmlOutputFromFile('Sidebar')
-    .setTitle('Doc Tag Index');
+    .setTitle('DocTagger');
   DocumentApp.getUi().showSidebar(output);
 }
 
@@ -58,7 +58,7 @@ function showDocTagHelp() {
   var output = HtmlService.createHtmlOutputFromFile('Help')
     .setWidth(460)
     .setHeight(520);
-  DocumentApp.getUi().showModalDialog(output, 'Doc Tag Index help and privacy');
+  DocumentApp.getUi().showModalDialog(output, 'DocTagger help and privacy');
 }
 
 function getSidebarState() {
@@ -117,7 +117,7 @@ function acceptDataUse() {
 
 function createRegistry() {
   dtiRequireDataUseConsent_();
-  var spreadsheet = SpreadsheetApp.create('Doc Tag Index Registry');
+  var spreadsheet = SpreadsheetApp.create('DocTagger Registry');
   dtiInitializeRegistry_(spreadsheet);
   dtiSetRegistryId_(spreadsheet.getId());
   return getSidebarState();
@@ -309,13 +309,13 @@ function syncCurrentDocumentFromMenu() {
   try {
     var result = syncCurrentDocument();
     DocumentApp.getUi().alert(
-      'Doc Tag Index',
+      'DocTagger',
       result.message,
       DocumentApp.getUi().ButtonSet.OK
     );
   } catch (error) {
     DocumentApp.getUi().alert(
-      'Doc Tag Index',
+      'DocTagger',
       error.message || String(error),
       DocumentApp.getUi().ButtonSet.OK
     );
@@ -701,7 +701,7 @@ function dtiInitializeRegistry_(spreadsheet) {
     'One row per option. Keep IDs stable. Use Active=FALSE to retire an option.'
   );
   var occurrenceSheet = spreadsheet.getSheetByName(DTI_SHEET_NAMES.occurrences);
-  occurrenceSheet.getRange('A1').setNote('Managed by Doc Tag Index; do not edit rows manually.');
+  occurrenceSheet.getRange('A1').setNote('Managed by DocTagger; do not edit rows manually.');
   spreadsheet.getSheetByName(DTI_SHEET_NAMES.summary)
     .getRange('A1').setNote('Rebuilt automatically during synchronization.');
 }
@@ -745,7 +745,7 @@ function dtiValidateRegistrySheets_(spreadsheet) {
     if (!currentExpected && !currentLegacy) {
       throw new Error(
         'The "' + sheet.getName() + '" sheet already exists but is not a ' +
-        'compatible Doc Tag Index sheet. Choose a dedicated registry Sheet.'
+        'compatible DocTagger sheet. Choose a dedicated registry Sheet.'
       );
     }
   });
@@ -759,7 +759,7 @@ function dtiEnsureHeaders_(sheet, headers) {
   var hasValues = current.some(function (value) { return value !== ''; });
   if (hasValues && current.join('\u0000') !== headers.join('\u0000')) {
     throw new Error(
-      'The "' + sheet.getName() + '" sheet exists but its header row does not match Doc Tag Index.'
+      'The "' + sheet.getName() + '" sheet exists but its header row does not match DocTagger.'
     );
   }
   sheet.getRange(1, 1, 1, headers.length)

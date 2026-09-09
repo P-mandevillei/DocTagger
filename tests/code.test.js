@@ -14,7 +14,7 @@ function loadCode(document) {
     },
   };
   vm.createContext(context);
-  for (const filename of ['Core.gs', 'Code.gs']) {
+  for (const filename of ['Core.js', 'Code.js']) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, '..', 'src', filename), 'utf8'),
       context,

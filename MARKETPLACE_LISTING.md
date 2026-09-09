@@ -1,18 +1,18 @@
 # Google Workspace Marketplace listing draft
 
-Replace every bracketed publisher field before submission. Keep the app name,
-OAuth consent-screen name, listing name, and in-product name identical.
+Keep the app name, OAuth consent-screen name, listing name, and in-product name
+identical. Resolve the two remaining publisher decisions before submission.
 
 ## App details
 
-- **Application name:** Doc Tag Index
+- **Application name:** DocTagger
 - **Category:** Productivity
 - **Pricing:** Free; no subscriptions, advertisements, or in-app purchases
-- **Short description (139 characters):** Add controlled property tags to Google Docs™ and synchronize searchable tag counts and links to a Google Sheets™ registry that you control.
+- **Short description:** Add controlled property tags to Google Docs™ and synchronize searchable tag counts and links to a Google Sheets™ registry that you control.
 
 ## Detailed description
 
-Doc Tag Index adds a structured property-and-tag workflow to collaborative
+DocTagger adds a structured property-and-tag workflow to collaborative
 documents. Define properties such as Status or Topic, create allowed options,
 and insert a visible tag at the current cursor position.
 
@@ -31,33 +31,33 @@ Key features:
 - collaboration through ordinary document and spreadsheet sharing; and
 - controls to disconnect a document or delete its indexed registry data.
 
-Doc Tag Index works entirely within Google-hosted services. It does not send
+DocTagger works entirely within Google-hosted services. It does not send
 document content to the developer, use advertising or analytics trackers, or
 use data to train AI models. Users control the sharing and deletion of their
 documents and registry Sheets.
 
-Doc Tag Index is free.
+DocTagger is free.
 
-Google Docs™ and Google Sheets™ are trademarks of Google LLC. Doc Tag Index is
+Google Docs™ and Google Sheets™ are trademarks of Google LLC. DocTagger is
 not endorsed by or affiliated with Google LLC.
 
 ## Public URLs
 
-- **Application website:** `https://[YOUR VERIFIED DOMAIN]/`
-- **Privacy policy:** `https://[YOUR VERIFIED DOMAIN]/privacy.html`
-- **Terms of service:** `https://[YOUR VERIFIED DOMAIN]/terms.html`
-- **Support:** `https://[YOUR VERIFIED DOMAIN]/support.html`
-- **Setup/help:** `https://[YOUR VERIFIED DOMAIN]/support.html`
-- **Data deletion:** `https://[YOUR VERIFIED DOMAIN]/delete-data.html`
+- **Application website:** `https://p-mandevillei.github.io/DocTagger/`
+- **Privacy policy:** `https://p-mandevillei.github.io/DocTagger/privacy.html`
+- **Terms of service:** `https://p-mandevillei.github.io/DocTagger/terms.html`
+- **Support:** `https://p-mandevillei.github.io/DocTagger/support.html`
+- **Setup/help:** `https://p-mandevillei.github.io/DocTagger/support.html`
+- **Data deletion:** `https://p-mandevillei.github.io/DocTagger/delete-data.html`
 
 ## Developer information
 
-- **Developer name:** [YOUR LEGAL NAME OR ACCURATE BUSINESS NAME]
-- **Developer website:** `https://[YOUR VERIFIED DOMAIN]/`
-- **Developer/support email:** [YOUR MONITORED SUPPORT EMAIL]
-- **Physical business/contact address:** [YOUR ACCURATE ADDRESS]
-- **EEA status:** [TRADER OR NON-TRADER — SELECT ACCURATELY]
-- **Name uniqueness:** [VERIFY NO EXISTING MARKETPLACE LISTING USES THIS NAME]
+- **Developer name:** Chenglin Li
+- **Developer website:** `https://p-mandevillei.github.io/DocTagger/`
+- **Developer/support email:** charlie.l38324@gmail.com
+- **Physical business/contact address:** 1 Brookings Drive, St. Louis, MO 63130
+- **EEA status:** Non-trader
+- **Name uniqueness:** A preliminary public web search on September 8, 2026 found no exact Google Workspace Marketplace listing named “DocTagger”; confirm again directly in Marketplace before submission.
 
 ## Graphic assets
 

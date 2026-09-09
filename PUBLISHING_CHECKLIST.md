@@ -24,20 +24,27 @@ with Google consoles.
 
 ## Manual publisher information
 
-- [ ] Replace all `[YOUR ...]` placeholders in `site/` and
-      `MARKETPLACE_LISTING.md` with accurate information.
+- [x] Replace publisher name, address, email, and public URL placeholders in
+      `docs/` and `MARKETPLACE_LISTING.md`.
 - [ ] Select an accurate EEA trader/non-trader status.
-- [ ] Have the terms reviewed for your jurisdiction if appropriate.
-- [ ] Use a monitored support email that can receive external messages.
-- [ ] Confirm “Doc Tag Index” is not already used by another Marketplace listing.
+- [ ] Replace `[YOUR JURISDICTION]` in `docs/terms.html` after choosing the
+      governing law; have the terms reviewed if appropriate.
+- [x] Use a monitored support email that can receive external messages.
+- [ ] Confirm “DocTagger” is not already used by another Marketplace listing.
 
 ## Verified public website
 
-- [ ] Publish `site/` at an HTTPS domain you own.
-- [ ] Verify the domain in Google Search Console using an owner/editor of the
-      production Google Cloud project.
-- [ ] Confirm every page and asset works without login or redirects.
-- [ ] Put the final public URLs in `src/Config.gs`.
+- [x] Publish `docs/` at `https://p-mandevillei.github.io/DocTagger/`.
+- [x] Verify `https://p-mandevillei.github.io` in Google Search Console
+      (publisher reported).
+- [ ] Confirm the OAuth Verification Center recognizes the authorized domain
+      as an owned **Domain property**. Current Google guidance says a URL-prefix
+      property is insufficient; use a custom domain with DNS verification if
+      Google doesn't accept the GitHub Pages host.
+- [x] Confirm all five public pages return HTTP 200 without a login.
+- [ ] Republish the current `docs/` directory; the live pages checked on
+      September 8, 2026 still displayed the former product name.
+- [x] Put the final public URLs in `src/Config.js`.
 - [ ] Use those identical homepage/privacy/terms URLs in OAuth and Marketplace.
 
 ## Apps Script and Cloud project

@@ -81,11 +81,9 @@ also contains:
   templates; and
 - `assets/`, containing icons and the Marketplace card banner.
 
-The public site is configured for
-<https://p-mandevillei.github.io/DocTagger/>. Before submission, publish the
-current `docs/` files, resolve the remaining jurisdiction placeholder, and
-confirm that Google accepts the site host as an authorized, owned domain. The
-final URLs are stored in `src/Config.js`.
+The public site is configured for <https://doctagger.org/>. Before submission,
+publish the current `docs/` files and verify `doctagger.org` as an authorized,
+owned Domain property. The final URLs are stored in `src/Config.js`.
 
 Existing pre-release registries use an older Occurrences schema that stored a
 context excerpt and inactive-history flag. The updated sidebar requires an

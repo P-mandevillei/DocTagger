@@ -26,24 +26,21 @@ with Google consoles.
 
 - [x] Replace publisher name, address, email, and public URL placeholders in
       `docs/` and `MARKETPLACE_LISTING.md`.
-- [ ] Select an accurate EEA trader/non-trader status.
-- [ ] Replace `[YOUR JURISDICTION]` in `docs/terms.html` after choosing the
-      governing law; have the terms reviewed if appropriate.
+- [x] Select an accurate EEA trader/non-trader status: Non-trader.
+- [x] Replace the jurisdiction placeholder with State of Missouri, United
+      States; have the terms reviewed if appropriate.
 - [x] Use a monitored support email that can receive external messages.
 - [ ] Confirm “DocTagger” is not already used by another Marketplace listing.
 
 ## Verified public website
 
-- [x] Publish `docs/` at `https://p-mandevillei.github.io/DocTagger/`.
-- [x] Verify `https://p-mandevillei.github.io` in Google Search Console
-      (publisher reported).
-- [ ] Confirm the OAuth Verification Center recognizes the authorized domain
-      as an owned **Domain property**. Current Google guidance says a URL-prefix
-      property is insufficient; use a custom domain with DNS verification if
-      Google doesn't accept the GitHub Pages host.
-- [x] Confirm all five public pages return HTTP 200 without a login.
-- [ ] Republish the current `docs/` directory; the live pages checked on
-      September 8, 2026 still displayed the former product name.
+- [ ] Publish `docs/` at `https://doctagger.org/` using the included `CNAME`.
+- [ ] Verify `doctagger.org` as a DNS-level **Domain property** in Google Search
+      Console using an account that is an Owner or Editor of the production
+      Google Cloud project.
+- [ ] Add `doctagger.org` to Google Auth Platform's Authorized domains.
+- [ ] Confirm all five public pages return HTTP 200 without a login and display
+      the DocTagger name.
 - [x] Put the final public URLs in `src/Config.js`.
 - [ ] Use those identical homepage/privacy/terms URLs in OAuth and Marketplace.
 

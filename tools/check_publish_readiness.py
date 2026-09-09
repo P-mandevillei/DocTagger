@@ -10,6 +10,7 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PRODUCTION_ORIGIN = "https://doctagger.org"
 failures = []
 
 
@@ -23,6 +24,12 @@ def check(condition, label, detail=""):
 required_site = ["index.html", "privacy.html", "terms.html", "support.html", "delete-data.html"]
 for filename in required_site:
     check((ROOT / "docs" / filename).exists(), f"Public site file: {filename}")
+check(
+    (ROOT / "docs" / "CNAME").read_text(encoding="utf-8").strip() == "doctagger.org"
+    if (ROOT / "docs" / "CNAME").exists() else False,
+    "GitHub Pages custom domain",
+    "docs/CNAME must contain doctagger.org",
+)
 
 missing_links = []
 for path in (ROOT / "docs").glob("*.html"):
@@ -49,9 +56,12 @@ check(
 config_text = (ROOT / "src" / "Config.js").read_text(encoding="utf-8")
 configured_urls = re.findall(r"\b(?:home|privacy|terms|support|deletion):\s*'([^']*)'", config_text)
 check(
-    len(configured_urls) == 5 and all(url.startswith("https://") for url in configured_urls),
+    len(configured_urls) == 5 and all(
+        url == PRODUCTION_ORIGIN + "/" or url.startswith(PRODUCTION_ORIGIN + "/")
+        for url in configured_urls
+    ),
     "Production URLs configured in src/Config.js",
-    "all five URLs must use the verified HTTPS domain",
+    "all five URLs must use https://doctagger.org",
 )
 
 manifest = json.loads((ROOT / "src" / "appsscript.json").read_text(encoding="utf-8"))

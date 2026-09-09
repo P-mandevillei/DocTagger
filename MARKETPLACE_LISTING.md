@@ -43,17 +43,17 @@ not endorsed by or affiliated with Google LLC.
 
 ## Public URLs
 
-- **Application website:** `https://p-mandevillei.github.io/DocTagger/`
-- **Privacy policy:** `https://p-mandevillei.github.io/DocTagger/privacy.html`
-- **Terms of service:** `https://p-mandevillei.github.io/DocTagger/terms.html`
-- **Support:** `https://p-mandevillei.github.io/DocTagger/support.html`
-- **Setup/help:** `https://p-mandevillei.github.io/DocTagger/support.html`
-- **Data deletion:** `https://p-mandevillei.github.io/DocTagger/delete-data.html`
+- **Application website:** `https://doctagger.org/`
+- **Privacy policy:** `https://doctagger.org/privacy.html`
+- **Terms of service:** `https://doctagger.org/terms.html`
+- **Support:** `https://doctagger.org/support.html`
+- **Setup/help:** `https://doctagger.org/support.html`
+- **Data deletion:** `https://doctagger.org/delete-data.html`
 
 ## Developer information
 
 - **Developer name:** Chenglin Li
-- **Developer website:** `https://p-mandevillei.github.io/DocTagger/`
+- **Developer website:** `https://doctagger.org/`
 - **Developer/support email:** charlie.l38324@gmail.com
 - **Physical business/contact address:** 1 Brookings Drive, St. Louis, MO 63130
 - **EEA status:** Non-trader

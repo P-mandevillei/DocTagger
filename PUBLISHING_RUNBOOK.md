@@ -6,30 +6,24 @@ same release.
 
 ## 1. Resolve the publisher-owned release blockers
 
-1. Choose the governing-law jurisdiction for the terms. Replace
-   `[YOUR JURISDICTION]` in `docs/terms.html`. Because the publisher address is
-   in Missouri, “State of Missouri, United States” may be a natural choice, but
-   this is a legal decision for the publisher rather than a technical default.
-2. Select the accurate EEA status in `MARKETPLACE_LISTING.md` and later in the
-   Marketplace SDK:
-   - **Trader** if publishing for purposes related to a trade, business, craft,
-     or profession, or on behalf of one.
-   - **Non-trader** if publishing for non-professional purposes.
-3. Confirm the Search Console property type. Current Google OAuth guidance
-   requires an owned **Domain property** verified through DNS by a Google Cloud
-   project Owner or Editor. A property whose name starts with `https://` is a
-   URL-prefix property and is not the required DNS-level verification.
-4. If Google does not recognize `p-mandevillei.github.io` as an owned Domain
-   property, attach a custom domain you control to GitHub Pages, add its DNS TXT
-   verification record in Search Console, and replace every public URL in
-   `src/Config.js`, the website, OAuth Branding, and the Marketplace listing.
+1. The terms currently use **State of Missouri, United States** as the
+   governing-law jurisdiction. Confirm that this remains your intended legal
+   choice before submission.
+2. The listing currently identifies the publisher as **Non-trader**. Confirm
+   this remains accurate when entering the Marketplace SDK fields.
+3. Verify `doctagger.org` as an owned **Domain property** through DNS using a
+   Google account that is a Project Owner or Editor in the production Cloud
+   project. A URL-prefix property is not the required DNS-level verification.
+4. Configure the GitHub Pages repository's custom domain as `doctagger.org`.
+   Keep `docs/CNAME` in the published branch, configure the required DNS records,
+   and enable HTTPS after GitHub finishes validating the records.
 5. Publish the updated `docs/` directory. Verify that all five pages display
    **DocTagger**, contain no bracketed placeholders, and load without login:
-   - `https://p-mandevillei.github.io/DocTagger/`
-   - `https://p-mandevillei.github.io/DocTagger/privacy.html`
-   - `https://p-mandevillei.github.io/DocTagger/terms.html`
-   - `https://p-mandevillei.github.io/DocTagger/support.html`
-   - `https://p-mandevillei.github.io/DocTagger/delete-data.html`
+   - `https://doctagger.org/`
+   - `https://doctagger.org/privacy.html`
+   - `https://doctagger.org/terms.html`
+   - `https://doctagger.org/support.html`
+   - `https://doctagger.org/delete-data.html`
 
 **Manual stop:** finish this section before entering URLs in Google Cloud.
 
@@ -69,10 +63,10 @@ Use the linked production Cloud project.
 
 - App name: **DocTagger**
 - User support email: `charlie.l38324@gmail.com`
-- Homepage: `https://p-mandevillei.github.io/DocTagger/`
-- Privacy policy: `https://p-mandevillei.github.io/DocTagger/privacy.html`
-- Terms: `https://p-mandevillei.github.io/DocTagger/terms.html`
-- Authorized domain: the accepted production domain without a scheme or path
+- Homepage: `https://doctagger.org/`
+- Privacy policy: `https://doctagger.org/privacy.html`
+- Terms: `https://doctagger.org/terms.html`
+- Authorized domain: `doctagger.org`
 - Developer contact: `charlie.l38324@gmail.com`
 - Logo: `assets/icon-128.png`
 

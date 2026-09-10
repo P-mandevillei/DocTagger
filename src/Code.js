@@ -217,7 +217,8 @@ function insertTag(propertyId, optionId) {
   }
   var documentTab = doc.getActiveTab().asDocumentTab();
   var bookmark = cursor.insertBookmark();
-  var text = cursor.insertText(dtiBuildTagText(option.propertyName, option.name));
+  var tagText = dtiBuildTagText(option.propertyName, option.name);
+  var text = cursor.insertText(tagText);
   if (!text) {
     if (bookmark) {
       bookmark.remove();
@@ -236,12 +237,15 @@ function insertTag(propertyId, optionId) {
     optionId: optionId,
     bookmarkId: bookmark.getId(),
   });
-  var range = documentTab.newRange().addElement(text).build();
+  // Keep the named range tied to the tag's characters. Whole-element ranges
+  // can absorb adjacent text when Docs normalizes text nodes, which makes a
+  // later removal broader than the selected tag.
+  var range = dtiBuildTagRange_(documentTab, text, tagText.length);
   documentTab.addNamedRange(rangeName, range);
 
   var result = dtiSyncCurrentDocument_(spreadsheet, definitions);
   return {
-    message: 'Inserted ' + text.getText() + ' and synchronized ' + result.tagCount + ' tag(s).',
+    message: 'Inserted ' + tagText + ' and synchronized ' + result.tagCount + ' tag(s).',
     state: getSidebarState(),
   };
 }
@@ -260,23 +264,9 @@ function removeTag(occurrenceId) {
         return false;
       }
 
-      var elements = namedRange.getRange().getRangeElements().slice().reverse();
+      var elements = namedRange.getRange().getRangeElements();
       namedRange.remove();
-      elements.forEach(function (rangeElement) {
-        var element = rangeElement.getElement();
-        if (element.getType() !== DocumentApp.ElementType.TEXT) {
-          return;
-        }
-        var text = element.asText();
-        if (rangeElement.isPartial()) {
-          text.deleteText(
-            rangeElement.getStartOffset(),
-            rangeElement.getEndOffsetInclusive()
-          );
-        } else {
-          text.removeFromParent();
-        }
-      });
+      dtiDeleteRangeText_(elements);
 
       var bookmark = documentTab.getBookmark(metadata.bookmarkId);
       if (bookmark) {
@@ -495,6 +485,38 @@ function dtiReadRangeText_(range) {
       ? value.slice(rangeElement.getStartOffset(), rangeElement.getEndOffsetInclusive() + 1)
       : value;
   }).join('');
+}
+
+function dtiBuildTagRange_(documentTab, text, tagLength) {
+  return documentTab.newRange()
+    .addElement(text, 0, tagLength - 1)
+    .build();
+}
+
+function dtiDeleteRangeText_(rangeElements) {
+  rangeElements.slice().reverse().forEach(function (rangeElement) {
+    var element = rangeElement.getElement();
+    if (element.getType() !== DocumentApp.ElementType.TEXT) {
+      return;
+    }
+    var text = element.asText();
+    var textLength = text.getText().length;
+    if (!textLength) {
+      return;
+    }
+    var startOffset = rangeElement.isPartial()
+      ? rangeElement.getStartOffset()
+      : 0;
+    var endOffset = rangeElement.isPartial()
+      ? rangeElement.getEndOffsetInclusive()
+      : textLength - 1;
+    if (startOffset < 0 || startOffset >= textLength || endOffset < startOffset) {
+      return;
+    }
+    // Delete the characters without detaching the Text node. Removing the
+    // entire node can invalidate neighboring managed ranges in Google Docs.
+    text.deleteText(startOffset, Math.min(endOffset, textLength - 1));
+  });
 }
 
 function dtiTagForSidebar_(tag) {

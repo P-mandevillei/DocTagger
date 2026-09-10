@@ -68,6 +68,70 @@ test('scans an empty document using Tab.getId and DocumentTab content APIs', () 
   );
 });
 
+test('builds managed tag ranges from the exact inserted character span', () => {
+  const context = loadCode({});
+  const calls = [];
+  const builtRange = {};
+  const text = {};
+  const builder = {
+    addElement(...args) {
+      calls.push(args);
+      return this;
+    },
+    build: () => builtRange,
+  };
+  const documentTab = { newRange: () => builder };
+
+  const result = context.dtiBuildTagRange_(documentTab, text, 15);
+
+  assert.equal(result, builtRange);
+  assert.deepEqual(calls, [[text, 0, 14]]);
+});
+
+test('deletes only the recorded tag characters without detaching text nodes', () => {
+  const context = loadCode({});
+  const calls = [];
+  const text = {
+    getText: () => 'Before [Status: Draft] after',
+    deleteText: (start, end) => calls.push(['deleteText', start, end]),
+    removeFromParent: () => calls.push(['removeFromParent']),
+  };
+  const rangeElement = {
+    getElement: () => ({
+      getType: () => 'TEXT',
+      asText: () => text,
+    }),
+    isPartial: () => true,
+    getStartOffset: () => 7,
+    getEndOffsetInclusive: () => 21,
+  };
+
+  context.dtiDeleteRangeText_([rangeElement]);
+
+  assert.deepEqual(calls, [['deleteText', 7, 21]]);
+});
+
+test('clears a whole-element legacy tag without removing its text node', () => {
+  const context = loadCode({});
+  const calls = [];
+  const text = {
+    getText: () => '[Status: Draft]',
+    deleteText: (start, end) => calls.push(['deleteText', start, end]),
+    removeFromParent: () => calls.push(['removeFromParent']),
+  };
+  const rangeElement = {
+    getElement: () => ({
+      getType: () => 'TEXT',
+      asText: () => text,
+    }),
+    isPartial: () => false,
+  };
+
+  context.dtiDeleteRangeText_([rangeElement]);
+
+  assert.deepEqual(calls, [['deleteText', 0, 14]]);
+});
+
 test('synchronization deletes stale occurrence rows and preserves first-seen time', () => {
   const document = { getId: () => 'd1' };
   const context = loadCode(document);

@@ -115,6 +115,33 @@ function dtiParseDisplayTag(text) {
   return match ? { propertyName: match[1].trim(), optionName: match[2].trim() } : null;
 }
 
+function dtiFindManagedTagSpan(text, expectedTagText) {
+  var value = String(text || '');
+  var expected = String(expectedTagText || '');
+  if (expected) {
+    var exactStart = value.indexOf(expected);
+    if (exactStart !== -1) {
+      return {
+        startOffset: exactStart,
+        endOffsetInclusive: exactStart + expected.length - 1,
+        tagText: expected,
+      };
+    }
+  }
+
+  var matches = [];
+  var pattern = /\[[^:\]\r\n]+:\s*[^\]\r\n]+\]/g;
+  var match;
+  while ((match = pattern.exec(value)) !== null) {
+    matches.push({
+      startOffset: match.index,
+      endOffsetInclusive: match.index + match[0].length - 1,
+      tagText: match[0],
+    });
+  }
+  return matches.length === 1 ? matches[0] : null;
+}
+
 function dtiBuildDocumentUrl(documentId) {
   return 'https://docs.google.com/document/d/' + encodeURIComponent(documentId) + '/edit';
 }

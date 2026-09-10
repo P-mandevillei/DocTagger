@@ -416,6 +416,10 @@
           label.rel = 'noopener';
           label.textContent = tag.tagText;
           details.appendChild(label);
+          var location = document.createElement('div');
+          location.className = 'tag-context';
+          location.textContent = tag.locationLabel || 'Location unavailable';
+          details.appendChild(location);
           var remove = document.createElement('button');
           remove.className = 'danger';
           remove.textContent = 'Remove';

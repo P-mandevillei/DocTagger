@@ -252,6 +252,8 @@ function insertTag(propertyId, optionId) {
 
 function removeTag(occurrenceId) {
   dtiRequireDataUseConsent_();
+  var spreadsheet = dtiRequireRegistry_();
+  var definitions = dtiReadDefinitions_(spreadsheet, true);
   var doc = DocumentApp.getActiveDocument();
   var tabs = dtiGetDocumentTabs_(doc);
   var removed = false;
@@ -265,8 +267,15 @@ function removeTag(occurrenceId) {
       }
 
       var elements = namedRange.getRange().getRangeElements();
+      var expectedTagText = dtiGetExpectedTagText_(metadata, definitions);
+      var resolved = dtiResolveManagedTagRange_(elements, expectedTagText);
+      if (!resolved) {
+        throw new Error(
+          'The selected tag boundaries are ambiguous. Synchronize the document and try again.'
+        );
+      }
       namedRange.remove();
-      dtiDeleteRangeText_(elements);
+      dtiDeleteTextSegments_(resolved.segments);
 
       var bookmark = documentTab.getBookmark(metadata.bookmarkId);
       if (bookmark) {
@@ -281,7 +290,7 @@ function removeTag(occurrenceId) {
     throw new Error('The selected tag no longer exists. Reload the sidebar.');
   }
 
-  var result = syncCurrentDocument();
+  var result = dtiSyncCurrentDocument_(spreadsheet, definitions);
   return {
     message: 'Tag removed. ' + result.tagCount + ' managed tag(s) remain.',
     state: getSidebarState(),
@@ -411,7 +420,7 @@ function dtiScanCurrentDocument_(definitions) {
   var documentUrl = dtiBuildDocumentUrl(documentId);
   var tags = [];
 
-  dtiGetDocumentTabs_(doc).forEach(function (tab) {
+  dtiGetDocumentTabs_(doc).forEach(function (tab, tabIndex) {
     var tabId = tab.getId();
     var documentTab = tab.asDocumentTab();
     documentTab.getNamedRanges().forEach(function (namedRange) {
@@ -420,13 +429,24 @@ function dtiScanCurrentDocument_(definitions) {
         return;
       }
       var range = namedRange.getRange();
-      var text = dtiReadRangeText_(range).trim();
+      var rangeElements = range.getRangeElements();
+      var definition = definitions.byOptionId[metadata.optionId];
+      var expectedTagText = dtiGetExpectedTagText_(metadata, definitions);
+      var resolved = dtiResolveManagedTagRange_(rangeElements, expectedTagText);
+      var text = resolved
+        ? resolved.tagText
+        : dtiReadRangeText_(range).trim();
       if (!text) {
         return;
       }
-      var definition = definitions.byOptionId[metadata.optionId];
       var parsedDisplay = dtiParseDisplayTag(text) || {};
       var bookmark = documentTab.getBookmark(metadata.bookmarkId);
+      var location = dtiGetTagLocation_(
+        tab,
+        documentTab,
+        bookmark,
+        resolved ? resolved.segments : dtiDescribeRangeText_(rangeElements).segments
+      );
       var propertyName = definition
         ? definition.propertyName
         : (parsedDisplay.propertyName || 'Unknown property');
@@ -447,11 +467,23 @@ function dtiScanCurrentDocument_(definitions) {
         tagText: text,
         namedRangeId: namedRange.getId(),
         bookmarkId: metadata.bookmarkId,
+        locationLabel: location.label,
+        locationParagraph: location.paragraphNumber,
+        locationCharacter: location.characterNumber,
+        locationTabOrder: tabIndex,
         active: true,
       });
     });
   });
 
+  tags.sort(function (left, right) {
+    return left.locationTabOrder - right.locationTabOrder ||
+      (left.locationParagraph || 2147483647) -
+        (right.locationParagraph || 2147483647) ||
+      (left.locationCharacter || 2147483647) -
+        (right.locationCharacter || 2147483647) ||
+      left.occurrenceId.localeCompare(right.occurrenceId);
+  });
   return tags;
 }
 
@@ -493,23 +525,85 @@ function dtiBuildTagRange_(documentTab, text, tagLength) {
     .build();
 }
 
-function dtiDeleteRangeText_(rangeElements) {
-  rangeElements.slice().reverse().forEach(function (rangeElement) {
+function dtiGetExpectedTagText_(metadata, definitions) {
+  var definition = definitions && definitions.byOptionId
+    ? definitions.byOptionId[metadata.optionId]
+    : null;
+  return definition && definition.propertyId === metadata.propertyId
+    ? dtiBuildTagText(definition.propertyName, definition.name)
+    : '';
+}
+
+function dtiDescribeRangeText_(rangeElements) {
+  var value = '';
+  var segments = [];
+  rangeElements.forEach(function (rangeElement) {
     var element = rangeElement.getElement();
     if (element.getType() !== DocumentApp.ElementType.TEXT) {
       return;
     }
     var text = element.asText();
-    var textLength = text.getText().length;
-    if (!textLength) {
-      return;
-    }
+    var fullText = text.getText();
     var startOffset = rangeElement.isPartial()
       ? rangeElement.getStartOffset()
       : 0;
     var endOffset = rangeElement.isPartial()
       ? rangeElement.getEndOffsetInclusive()
-      : textLength - 1;
+      : fullText.length - 1;
+    if (startOffset < 0 || startOffset >= fullText.length || endOffset < startOffset) {
+      return;
+    }
+    endOffset = Math.min(endOffset, fullText.length - 1);
+    var segmentText = fullText.slice(startOffset, endOffset + 1);
+    var flatStart = value.length;
+    value += segmentText;
+    segments.push({
+      text: text,
+      startOffset: startOffset,
+      endOffsetInclusive: endOffset,
+      flatStart: flatStart,
+      flatEndInclusive: value.length - 1,
+    });
+  });
+  return { text: value, segments: segments };
+}
+
+function dtiResolveManagedTagRange_(rangeElements, expectedTagText) {
+  var described = dtiDescribeRangeText_(rangeElements);
+  var span = dtiFindManagedTagSpan(described.text, expectedTagText);
+  if (!span) {
+    return null;
+  }
+  var segments = described.segments.filter(function (segment) {
+    return segment.flatStart <= span.endOffsetInclusive &&
+      segment.flatEndInclusive >= span.startOffset;
+  }).map(function (segment) {
+    return {
+      text: segment.text,
+      startOffset: segment.startOffset +
+        Math.max(span.startOffset - segment.flatStart, 0),
+      endOffsetInclusive: segment.startOffset +
+        Math.min(span.endOffsetInclusive, segment.flatEndInclusive) -
+        segment.flatStart,
+      flatStart: segment.flatStart,
+    };
+  });
+  return { tagText: span.tagText, segments: segments };
+}
+
+function dtiDeleteRangeText_(rangeElements) {
+  dtiDeleteTextSegments_(dtiDescribeRangeText_(rangeElements).segments);
+}
+
+function dtiDeleteTextSegments_(segments) {
+  segments.slice().reverse().forEach(function (segment) {
+    var text = segment.text;
+    var textLength = text.getText().length;
+    if (!textLength) {
+      return;
+    }
+    var startOffset = segment.startOffset;
+    var endOffset = segment.endOffsetInclusive;
     if (startOffset < 0 || startOffset >= textLength || endOffset < startOffset) {
       return;
     }
@@ -519,6 +613,96 @@ function dtiDeleteRangeText_(rangeElements) {
   });
 }
 
+function dtiGetTagLocation_(tab, documentTab, bookmark, segments) {
+  var title = typeof tab.getTitle === 'function' ? tab.getTitle() : 'Document tab';
+  var paragraphNumber = segments.length
+    ? dtiGetBodyParagraphNumber_(documentTab, segments[0].text)
+    : 0;
+  var characterNumber = 0;
+  if (bookmark) {
+    try {
+      var position = bookmark.getPosition();
+      if (position && typeof position.getSurroundingTextOffset === 'function') {
+        characterNumber = position.getSurroundingTextOffset() + 1;
+      }
+    } catch (error) {
+      characterNumber = 0;
+    }
+  }
+  if (!characterNumber && segments.length) {
+    characterNumber = segments[0].startOffset + 1;
+  }
+
+  var parts = [title || 'Document tab'];
+  if (paragraphNumber) {
+    parts.push('Paragraph ' + paragraphNumber);
+  }
+  if (characterNumber) {
+    parts.push('Character ' + characterNumber);
+  }
+  return {
+    label: parts.join(' · '),
+    paragraphNumber: paragraphNumber,
+    characterNumber: characterNumber,
+  };
+}
+
+function dtiGetBodyParagraphNumber_(documentTab, text) {
+  var paragraph = dtiGetTextBlock_(text);
+  if (!paragraph || typeof documentTab.getBody !== 'function') {
+    return 0;
+  }
+  var targetPath = dtiGetElementPathKey_(paragraph);
+  var bodyType = String(DocumentApp.ElementType.BODY_SECTION) + ':';
+  if (!targetPath || targetPath.indexOf(bodyType) !== 0) {
+    return 0;
+  }
+  var paragraphs = documentTab.getBody().getParagraphs() || [];
+  var paragraphNumber = 0;
+  paragraphs.some(function (candidate, index) {
+    if (dtiGetElementPathKey_(candidate) === targetPath) {
+      paragraphNumber = index + 1;
+      return true;
+    }
+    return false;
+  });
+  return paragraphNumber;
+}
+
+function dtiGetTextBlock_(element) {
+  var current = element;
+  while (current) {
+    var type = current.getType();
+    if (type === DocumentApp.ElementType.PARAGRAPH ||
+        type === DocumentApp.ElementType.LIST_ITEM) {
+      return current;
+    }
+    current = typeof current.getParent === 'function' ? current.getParent() : null;
+  }
+  return null;
+}
+
+function dtiGetElementPathKey_(element) {
+  var path = [];
+  var current = element;
+  while (current && typeof current.getParent === 'function') {
+    var parent = current.getParent();
+    if (!parent || typeof parent.getChildIndex !== 'function') {
+      return '';
+    }
+    path.unshift(parent.getChildIndex(current));
+    var parentType = parent.getType();
+    if (parentType === DocumentApp.ElementType.BODY_SECTION ||
+        parentType === DocumentApp.ElementType.HEADER_SECTION ||
+        parentType === DocumentApp.ElementType.FOOTER_SECTION ||
+        parentType === DocumentApp.ElementType.FOOTNOTE_SECTION) {
+      return String(parentType) + ':' + path.join('.');
+    }
+    current = parent;
+  }
+  return '';
+}
+
 function dtiTagForSidebar_(tag) {
   return {
     occurrenceId: tag.occurrenceId,
@@ -526,6 +710,7 @@ function dtiTagForSidebar_(tag) {
     optionName: tag.optionName,
     tagText: tag.tagText,
     tagUrl: tag.tagUrl,
+    locationLabel: tag.locationLabel,
   };
 }
 

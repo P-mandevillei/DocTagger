@@ -54,6 +54,30 @@ test('round-trips managed named-range metadata', () => {
   assert.equal(context.dtiParseManagedRange('someone-elses-range'), null);
 });
 
+test('finds one managed tag inside a named range that absorbed an adjacent tag', () => {
+  const first = '[Difficulty: Easy]';
+  const second = '[Difficulty: Higher-Distinguishing]';
+  const combined = first + second;
+
+  assert.deepEqual(
+    { ...context.dtiFindManagedTagSpan(combined, first) },
+    {
+      startOffset: 0,
+      endOffsetInclusive: first.length - 1,
+      tagText: first,
+    }
+  );
+  assert.deepEqual(
+    { ...context.dtiFindManagedTagSpan(combined, second) },
+    {
+      startOffset: first.length,
+      endOffsetInclusive: combined.length - 1,
+      tagText: second,
+    }
+  );
+  assert.equal(context.dtiFindManagedTagSpan(combined, ''), null);
+});
+
 test('creates document and exact-tag URLs', () => {
   assert.equal(
     context.dtiBuildTagUrl('doc id', 't.0', 'id.abc'),

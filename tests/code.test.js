@@ -8,7 +8,15 @@ function loadCode(document) {
   const context = {
     encodeURIComponent,
     DocumentApp: {
-      ElementType: { TEXT: 'TEXT' },
+      ElementType: {
+        BODY_SECTION: 'BODY_SECTION',
+        FOOTER_SECTION: 'FOOTER_SECTION',
+        FOOTNOTE_SECTION: 'FOOTNOTE_SECTION',
+        HEADER_SECTION: 'HEADER_SECTION',
+        LIST_ITEM: 'LIST_ITEM',
+        PARAGRAPH: 'PARAGRAPH',
+        TEXT: 'TEXT',
+      },
       TabType: { DOCUMENT_TAB: 'DOCUMENT_TAB' },
       getActiveDocument: () => document,
     },
@@ -68,6 +76,85 @@ test('scans an empty document using Tab.getId and DocumentTab content APIs', () 
   );
 });
 
+test('scans adjacent tags as separate sidebar entries with separate locations', () => {
+  const first = '[Difficulty: Easy]';
+  const second = '[Difficulty: Higher-Distinguishing]';
+  const paragraph = {
+    getType: () => 'PARAGRAPH',
+    getParent: () => body,
+  };
+  const body = {
+    getType: () => 'BODY_SECTION',
+    getChildIndex: () => 0,
+    getParagraphs: () => [paragraph],
+  };
+  const text = {
+    getType: () => 'TEXT',
+    asText() { return this; },
+    getText: () => first + second,
+    getParent: () => paragraph,
+  };
+  const wholeRangeElement = {
+    getElement: () => text,
+    isPartial: () => false,
+  };
+  const secondRangeElement = {
+    getElement: () => text,
+    isPartial: () => true,
+    getStartOffset: () => first.length,
+    getEndOffsetInclusive: () => first.length + second.length - 1,
+  };
+  const namedRanges = [
+    {
+      getName: () => 'GDT1|t_first|p1|o1|b1',
+      getRange: () => ({ getRangeElements: () => [wholeRangeElement] }),
+      getId: () => 'r1',
+    },
+    {
+      getName: () => 'GDT1|t_second|p1|o2|b2',
+      getRange: () => ({ getRangeElements: () => [secondRangeElement] }),
+      getId: () => 'r2',
+    },
+  ];
+  const documentTab = {
+    getNamedRanges: () => namedRanges,
+    getBookmark: (id) => ({
+      getPosition: () => ({
+        getSurroundingTextOffset: () => id === 'b1' ? 0 : first.length,
+      }),
+    }),
+    getBody: () => body,
+  };
+  const tab = {
+    getType: () => 'DOCUMENT_TAB',
+    getId: () => 't.0',
+    getTitle: () => 'Main',
+    asDocumentTab: () => documentTab,
+    getChildTabs: () => [],
+  };
+  const document = {
+    getId: () => 'document-id',
+    getName: () => 'Test document',
+    getTabs: () => [tab],
+  };
+  const context = loadCode(document);
+  const definitions = { byOptionId: {
+    o1: { propertyId: 'p1', propertyName: 'Difficulty', name: 'Easy' },
+    o2: {
+      propertyId: 'p1',
+      propertyName: 'Difficulty',
+      name: 'Higher-Distinguishing',
+    },
+  } };
+
+  const tags = Array.from(context.dtiScanCurrentDocument_(definitions));
+
+  assert.deepEqual(tags.map((tag) => [tag.tagText, tag.locationLabel]), [
+    [first, 'Main · Paragraph 1 · Character 1'],
+    [second, `Main · Paragraph 1 · Character ${first.length + 1}`],
+  ]);
+});
+
 test('builds managed tag ranges from the exact inserted character span', () => {
   const context = loadCode({});
   const calls = [];
@@ -86,6 +173,71 @@ test('builds managed tag ranges from the exact inserted character span', () => {
 
   assert.equal(result, builtRange);
   assert.deepEqual(calls, [[text, 0, 14]]);
+});
+
+test('narrows an absorbed adjacent-tag range before deleting it', () => {
+  const context = loadCode({});
+  const first = '[Difficulty: Easy]';
+  const second = '[Difficulty: Higher-Distinguishing]';
+  const calls = [];
+  const text = {
+    getText: () => first + second,
+    deleteText: (start, end) => calls.push([start, end]),
+  };
+  const rangeElement = {
+    getElement: () => ({
+      getType: () => 'TEXT',
+      asText: () => text,
+    }),
+    isPartial: () => false,
+  };
+
+  const resolved = context.dtiResolveManagedTagRange_([rangeElement], first);
+  context.dtiDeleteTextSegments_(resolved.segments);
+
+  assert.equal(resolved.tagText, first);
+  assert.deepEqual(calls, [[0, first.length - 1]]);
+});
+
+test('reports a tag location by tab, paragraph, and character', () => {
+  const context = loadCode({});
+  const body = {
+    getType: () => 'BODY_SECTION',
+    getChildIndex: (child) => child === firstParagraph ? 0 : 1,
+    getParagraphs: () => [firstParagraph, secondParagraph],
+  };
+  const firstParagraph = {
+    getType: () => 'PARAGRAPH',
+    getParent: () => body,
+  };
+  const secondParagraph = {
+    getType: () => 'PARAGRAPH',
+    getParent: () => body,
+  };
+  const text = {
+    getType: () => 'TEXT',
+    getParent: () => secondParagraph,
+  };
+  const tab = { getTitle: () => 'Analysis' };
+  const documentTab = { getBody: () => body };
+  const bookmark = {
+    getPosition: () => ({ getSurroundingTextOffset: () => 7 }),
+  };
+
+  const location = context.dtiGetTagLocation_(tab, documentTab, bookmark, [{
+    text,
+    startOffset: 7,
+    endOffsetInclusive: 21,
+  }]);
+
+  assert.deepEqual(
+    { ...location },
+    {
+      label: 'Analysis · Paragraph 2 · Character 8',
+      paragraphNumber: 2,
+      characterNumber: 8,
+    }
+  );
 });
 
 test('deletes only the recorded tag characters without detaching text nodes', () => {

@@ -77,8 +77,8 @@ also contains:
 - [OAUTH_VERIFICATION.md](OAUTH_VERIFICATION.md), with scope justifications and
   a verification-video script;
 - [REVIEW_TEST_PLAN.md](REVIEW_TEST_PLAN.md), for production manual testing;
-- `docs/`, containing the GitHub Pages homepage, privacy, terms, support, and deletion-page
-  templates; and
+- `docs/`, containing the GitHub Pages homepage, privacy, terms, support,
+  post-install, and deletion-page templates; and
 - `assets/`, containing icons and the Marketplace card banner.
 
 The public site is configured for <https://doctagger.org/>. Before submission,

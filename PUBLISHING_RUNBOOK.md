@@ -17,12 +17,13 @@ same release.
 4. Configure the GitHub Pages repository's custom domain as `doctagger.org`.
    Keep `docs/CNAME` in the published branch, configure the required DNS records,
    and enable HTTPS after GitHub finishes validating the records.
-5. Publish the updated `docs/` directory. Verify that all five pages display
+5. Publish the updated `docs/` directory. Verify that all six pages display
    **DocTagger**, contain no bracketed placeholders, and load without login:
    - `https://doctagger.org/`
    - `https://doctagger.org/privacy.html`
    - `https://doctagger.org/terms.html`
    - `https://doctagger.org/support.html`
+   - `https://doctagger.org/post-install.html`
    - `https://doctagger.org/delete-data.html`
 
 **Manual stop:** finish this section before entering URLs in Google Cloud.
@@ -145,9 +146,9 @@ In **Google Workspace Marketplace SDK > Store Listing**:
 2. Choose **Productivity** and **Free of charge**.
 3. Upload `assets/icon-32.png`, `assets/icon-128.png`,
    `assets/card-banner-220x140.png`, and the real screenshots.
-4. Enter the final terms, privacy, support, setup/help, website, developer, and
-   trader-status fields. Confirm no existing Marketplace app has the exact name
-   **DocTagger**.
+4. Enter the final terms, privacy, support, setup/help, post-install tip,
+   website, developer, and trader-status fields. Confirm no existing Marketplace
+   app has the exact name **DocTagger**.
 5. Add Gmail draft testers if the Draft Tester section is available, then
    install and test the draft listing.
 6. Once OAuth verification is approved, select **Submit for review**. Public

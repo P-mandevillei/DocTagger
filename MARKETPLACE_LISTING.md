@@ -48,6 +48,7 @@ not endorsed by or affiliated with Google LLC.
 - **Terms of service:** `https://doctagger.org/terms.html`
 - **Support:** `https://doctagger.org/support.html`
 - **Setup/help:** `https://doctagger.org/support.html`
+- **Post-install tip:** `https://doctagger.org/post-install.html`
 - **Data deletion:** `https://doctagger.org/delete-data.html`
 
 ## Developer information

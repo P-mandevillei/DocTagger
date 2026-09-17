@@ -78,7 +78,7 @@ also contains:
   a verification-video script;
 - [REVIEW_TEST_PLAN.md](REVIEW_TEST_PLAN.md), for production manual testing;
 - `docs/`, containing the GitHub Pages homepage, privacy, terms, support,
-  post-install, and deletion-page templates; and
+  post-install, draft-tester opt-out, and deletion-page templates; and
 - `assets/`, containing icons and the Marketplace card banner.
 
 The public site is configured for <https://doctagger.org/>. Before submission,

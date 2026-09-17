@@ -39,7 +39,7 @@ with Google consoles.
       Console using an account that is an Owner or Editor of the production
       Google Cloud project.
 - [ ] Add `doctagger.org` to Google Auth Platform's Authorized domains.
-- [ ] Confirm all six public pages return HTTP 200 without a login and display
+- [ ] Confirm all seven public pages return HTTP 200 without a login and display
       the DocTagger name.
 - [x] Put the final public URLs in `src/Config.js`.
 - [ ] Use those identical homepage/privacy/terms URLs in OAuth and Marketplace.

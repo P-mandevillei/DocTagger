@@ -33,7 +33,7 @@ test('manifest requests only the reviewed release scopes', () => {
 test('public site includes required policy and support pages', () => {
   for (const filename of [
     'index.html', 'privacy.html', 'terms.html', 'support.html', 'post-install.html',
-    'delete-data.html',
+    'draft-tester-opt-out.html', 'delete-data.html',
   ]) {
     assert.equal(fs.existsSync(path.join(root, 'docs', filename)), true, filename);
   }

@@ -49,6 +49,7 @@ not endorsed by or affiliated with Google LLC.
 - **Support:** `https://doctagger.org/support.html`
 - **Setup/help:** `https://doctagger.org/support.html`
 - **Post-install tip:** `https://doctagger.org/post-install.html`
+- **Draft-tester opt-out:** `https://doctagger.org/draft-tester-opt-out.html`
 - **Data deletion:** `https://doctagger.org/delete-data.html`
 
 ## Developer information
